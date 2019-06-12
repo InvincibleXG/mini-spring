@@ -1,5 +1,9 @@
 package com.xg.starter;
 
+import com.xg.web.server.TomcatServer;
+
+import org.apache.catalina.LifecycleException;
+
 public class MiniApplication
 {
     /**
@@ -10,5 +14,11 @@ public class MiniApplication
     public static void run(Class<?> clazz, String[] args)
     {
         System.out.println("fuck mini");
+        TomcatServer tomcatServer=new TomcatServer(args);
+        try {
+            tomcatServer.startServer();
+        } catch (LifecycleException e) {
+            e.printStackTrace();
+        }
     }
 }
