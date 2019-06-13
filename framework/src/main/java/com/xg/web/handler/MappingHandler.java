@@ -1,6 +1,6 @@
 package com.xg.web.handler;
 
-import com.sun.org.apache.bcel.internal.generic.RETURN;
+import com.xg.beans.BeanFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -45,7 +45,8 @@ public class MappingHandler
             parameters[i]=req.getParameter(args[i]);
         }
         // 反射实例化一个 controller 对象
-        Object controller=controllerClazz.newInstance();
+//        Object controller=controllerClazz.newInstance();
+        Object controller=BeanFactory.getBean(controllerClazz);
         // 反射调用 controller的handler方法 也就是 servlet 方法响应匹配的请求
         Object response=method.invoke(controller, parameters);
         // 将请求处理的结果进行响应

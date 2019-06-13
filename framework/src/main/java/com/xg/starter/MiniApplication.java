@@ -1,5 +1,6 @@
 package com.xg.starter;
 
+import com.xg.beans.BeanFactory;
 import com.xg.core.ClassScanner;
 import com.xg.web.handler.HandlerManager;
 import com.xg.web.server.TomcatServer;
@@ -25,6 +26,8 @@ public class MiniApplication
             // 扫描根包得到所有的类
             List<Class<?>> classList=ClassScanner.scanClass(packageName);
 //            classList.forEach(it->System.out.println(it.getName()));
+            // 工厂初始化Bean
+            BeanFactory.initBean(classList);
             // 对使用@Controller注解的类进行注册 之后DispatcherServlet将据此分配对应的请求
             HandlerManager.resolveMappingHandler(classList);
         } catch (Exception e) {
