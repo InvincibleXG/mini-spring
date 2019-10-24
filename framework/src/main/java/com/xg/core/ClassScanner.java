@@ -1,5 +1,6 @@
 package com.xg.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -21,7 +22,7 @@ public class ClassScanner
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static List<Class<?>> scanClass(String packageName) throws IOException, ClassNotFoundException
+    public static List<Class<?>> scanClass(String packageName) throws Exception
     {
         List<Class<?>> classList=new ArrayList<>();
         // 将包名转为路径
@@ -35,11 +36,18 @@ public class ClassScanner
             URL resource=resources.nextElement();
             if (resource.getProtocol().contains("jar")){
                 // 如果资源类型为 jar
-                JarURLConnection jarURLConnection= (JarURLConnection) resource.openConnection();
+                JarURLConnection jarURLConnection=(JarURLConnection)resource.openConnection();
                 String jarFilePath=jarURLConnection.getJarFile().getName();
                 classList.addAll(getClassesFromJar(jarFilePath, path));
+            }else if (resource.getProtocol().startsWith("file")){
+                // 如果资源类型为 普通文件 读取目录中的class
+                File directory = new File(resource.getFile());
+                if (directory.isDirectory()){
+                    collectClassesFromDir(directory, classList);
+                }
             }else{
                 // 其他资源类型暂无操作
+                System.out.println(resource);
             }
         }
         return classList;
@@ -67,5 +75,50 @@ public class ClassScanner
             }
         }
         return classList;
+    }
+
+    /**
+     *  从目录中遍历出所有的class类对象
+     * @param directory 确认为目录的文件对象
+     * @param classList 收集全部class的列表集合
+     * @throws Exception
+     */
+    private static void collectClassesFromDir(File directory, List<Class<?>> classList) throws Exception {
+        File[] classOrDirFiles = directory.listFiles(file -> {
+            if (file.isDirectory() || file.getName().endsWith(".class")) return true;
+            return false;
+        });
+        for (File classOrDirFile:classOrDirFiles){
+            if (classOrDirFile.isDirectory()){
+                collectClassesFromDir(classOrDirFile, classList);
+            }else{
+                classList.add(Class.forName(absolutePathToClassName(classOrDirFile.getAbsolutePath())));
+            }
+        }
+    }
+
+    /**
+     *  将遍历到的class文件（不在jar包中）的绝对路径截取出正确的类名
+     * @param classFullPath
+     * @return ClassName String like "com.xg.Abc"
+     * @throws Exception
+     */
+    private static String absolutePathToClassName(String classFullPath) throws Exception {
+        if (classFullPath!=null){
+            int startIndex=classFullPath.indexOf("java/main/");
+            if (startIndex<0){
+                startIndex=classFullPath.indexOf("test/main/");
+            }
+            int end=classFullPath.length()-6;
+            if (startIndex>=0 && end>startIndex){
+                startIndex+=10;
+                String className=classFullPath.substring(startIndex, end).replace("/", ".");
+                return className;
+            }else{
+                throw new Exception("cannot recognize ClassName in FilePath");
+            }
+        }else{
+            throw new Exception("classFileFullPath is null");
+        }
     }
 }

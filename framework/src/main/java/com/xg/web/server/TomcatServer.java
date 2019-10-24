@@ -21,7 +21,7 @@ public class TomcatServer
     {
         // 实例化 Tomcat
         tomcat=new Tomcat();
-        tomcat.setPort(6699);
+        tomcat.setPort(12345);
         tomcat.start();
         // 创建标准上下文 并配置默认的 Tomcat监听器
         Context context=new StandardContext();

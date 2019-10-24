@@ -1,4 +1,7 @@
 ﻿HELP.md
+*.bin
+*.lock
+*.jar
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 *.doc*
@@ -31,3 +34,5 @@
 /.nb-gradle/
 /build/
 */build/
+/.gradle/
+/gradle/

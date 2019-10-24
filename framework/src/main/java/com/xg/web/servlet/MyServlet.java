@@ -35,12 +35,13 @@ public class MyServlet implements Servlet
     {
         // 自定义响应
 //        res.getWriter().println("Hello MyServlet");
+        System.out.println(req.getRemoteHost()+"请求"+((HttpServletRequest)req).getRequestURL());
         for (MappingHandler mappingHandler:HandlerManager.mappingHandlerList){
             try {
                 if (mappingHandler.handle(req, res)){
                     return;
                 }
-                System.out.println(req.getRemoteHost()+"请求"+((HttpServletRequest)req).getRequestURL()+" 没有Servlet可响应");
+                System.out.println(" ——没有Servlet可响应");
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InstantiationException e) {
